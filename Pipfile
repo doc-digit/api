@@ -8,8 +8,12 @@ pylint = "*"
 
 [packages]
 sanic = "*"
-sanic-openapi = "*"
 pytest-sanic = "*"
+minio = "*"
+gino = "*"
+"psycopg2" = "*"
+"psycopg2-binary" = "*"
+sanic-openapi = {git = "https://github.com/DirkGuijt/sanic-openapi.git"}
 
 [requires]
 python_version = "3.7"

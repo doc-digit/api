@@ -14,8 +14,8 @@ pipenv install --dev
 Run:
 ```
 pipenv shell
-cd adapter 
-python main.py
+cd api 
+python -m api.main
 ```
 
 Swagger available at http://0.0.0.0:8000/swagger
