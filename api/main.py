@@ -8,11 +8,14 @@ from api.exceptions import NotFoundException
 from core import config
 from api.routes.storage import router as storage_router
 from api.routes.user import router as user_router
+from api.routes.student import router as student_router
+
 from api.database import SessionLocal
 
 app = FastAPI(title="docdigit-api", version="0.1")
 app.include_router(storage_router, prefix="/storage", tags=["storage"])
 app.include_router(user_router, prefix="/user", tags=["user"])
+app.include_router(student_router, prefix="/student", tags=["student"])
 
 
 @app.middleware("http")
