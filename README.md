@@ -1,32 +1,35 @@
 # Doc-digit api
-Main purpose of having this is to allow client to interact with  file storage, processing server and more (its just a quick draft).
 
+Main purpose of having this is to allow client to interact with file storage, processing server and more (its just a quick draft).
 
 Python3.7, FastAPI, Pytest for testing.
 
 ## How to
 
 Install:
+
 ```
-pipenv install --dev  
+pipenv install --dev
 ```
 
 Run:
+
 ```
 pipenv shell
 uvicorn api.main:app --reload
 ```
 
-Swagger available at http://0.0.0.0:8000/swagger
+Docs available at http://0.0.0.0:8000/docs
 
 Test:
+
 ```
 pipenv shell
 python -m pytest
 ```
 
+# Api parts
 
-# Api parts 
 Api is divided to parts, that do things.
 
 ## Storage adapter
@@ -36,6 +39,7 @@ For now we use Minio as a storage system. However it may always change, thats th
 Although Minio is nice, we found that some features that we need are missing. That's what adapter will take care of too.
 
 ### Draft of client flow:
+
 - client uploads file (possibly photo), adapter (server returns file key) -oauth 2 authorization code grant PKCE
 - adapter uploads file to storage (now minio), after upload is complete adapter adds a task to a rabbitmq2. Processing microservice
 - gets task from rabbitmq, then do processing and send a file to adapter
