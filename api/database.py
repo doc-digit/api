@@ -1,42 +1,18 @@
 import uuid
-from gino.ext.sanic import Gino
+
+# from gino.ext.sanic import Gino
 
 from sqlalchemy.dialects import postgresql
 
-db = Gino()
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
+from core import config
+from api.models import Base
 
-# uuid field fix 
-class UUID(postgresql.UUID):
-    def result_processor(self, dialect, coltype):
-        if self.as_uuid:
+engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-            def process(value):
-                if not isinstance(value, uuid.UUID):
-                    value = uuid.UUID(value)
-                return value
+Base.metadata.create_all(bind=engine)
 
-            return process
-        else:
-            return None
-            
-
-"""
-Models
-"""
-
-class Document(db.Model):
-    __tablename__ = 'documents'
-    id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-
-    def __repr__(self):
-        return 'Document {}'.format(self.id)
-
-        
-class Page(db.Model):
-    __tablename__ = 'pages'
-    id = db.Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    document_id = db.Column(db.ForeignKey('documents.id'))
-
-    def __repr__(self):
-        return 'Page {} Document {}'.format(self.id, self.document_id)
+db_session = SessionLocal()

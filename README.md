@@ -2,7 +2,7 @@
 Main purpose of having this is to allow client to interact with  file storage, processing server and more (its just a quick draft).
 
 
-Python3.7, Sanic framework, Pytest for testing.
+Python3.7, FastAPI, Pytest for testing.
 
 ## How to
 
@@ -14,8 +14,7 @@ pipenv install --dev
 Run:
 ```
 pipenv shell
-cd api 
-python -m api.main
+uvicorn api.main:app --reload
 ```
 
 Swagger available at http://0.0.0.0:8000/swagger

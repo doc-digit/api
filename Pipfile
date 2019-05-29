@@ -5,15 +5,17 @@ name = "pypi"
 
 [dev-packages]
 pylint = "*"
+requests = "*"
 
 [packages]
-sanic = "*"
-pytest-sanic = "*"
 minio = "*"
-gino = "*"
 "psycopg2" = "*"
 "psycopg2-binary" = "*"
-sanic-openapi = {git = "https://github.com/DirkGuijt/sanic-openapi.git"}
+rabbitmq = "*"
+fastapi = "*"
+uvicorn = "*"
+pydantic = "*"
+sqlalchemy = "*"
 
 [requires]
 python_version = "3.7"

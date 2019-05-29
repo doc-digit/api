@@ -1,33 +1,38 @@
-import uuid 
-import aiohttp
+import requests
 
-async def test_upload_url(test_cli):
-    resp = await test_cli.get('/storage/upload')
-    assert resp.status == 200
-    resp_data = await resp.json()
+
+def test_upload_url(client):
+    resp = client.get("/storage/upload")
+    assert resp.status_code == 200
+    resp_data = resp.json()
     assert "url" in resp_data
 
-async def test_file_get(test_cli):
-    resp = await test_cli.get("/storage/file/abc")
-    assert resp.status == 404
 
-async def test_upload_and_get(test_cli):
-    resp = await test_cli.get('/storage/upload')
-    resp_data = await resp.json()
-    
-    file_name = resp_data['id']
+def test_file_get(client):
+    resp = client.get("/storage/file/3fa85f64-5717-4562-b3fc-2c963f66afa6")
+    print(resp.text)
+    assert resp.status_code == 404
 
-    bin_data = b'A'*10
-    async with aiohttp.ClientSession() as session:
-        async with session.put(resp_data['url'],data=bin_data) as resp:
-            assert resp.status == 200
 
-    resp = await test_cli.get('/storage/file/'+file_name)
-    resp_data = await resp.json()
+def test_upload_and_get(client):
+    resp = client.get("/storage/upload")
+    resp_data = resp.json()
 
-    assert resp_data['id'] == file_name
+    file_name = resp_data["id"]
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(resp_data['url']) as resp:
-            assert resp.status == 200
-            assert bin_data == await resp.read()
+    bin_data = b"A" * 10
+
+    print(resp_data["url"])
+    resp = requests.put(resp_data["url"], data=bin_data)
+    print(resp.text, resp.request.method)
+    assert resp.status_code == 200
+
+    resp = client.get("/storage/file/" + file_name)
+    resp_data = resp.json()
+
+    assert resp_data["id"] == file_name
+
+    resp = requests.get(resp_data["url"])
+
+    assert resp.status_code == 200
+    assert bin_data == resp.content
