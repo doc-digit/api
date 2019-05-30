@@ -27,7 +27,7 @@ def find_student_by_name(db_session: Session, query: str):
     return students
 
 
-@router.get("/find/", response_model=List[StudentOut])
+@router.get("/find", response_model=List[StudentOut])
 def find_student(q: str = Query(None, min_length=3), db: Session = Depends(get_db)):
     """
     Find student by name (currently)

@@ -1,4 +1,5 @@
 import os
+import logging
 
 from fastapi import FastAPI
 from starlette.requests import Request
@@ -9,13 +10,18 @@ from core import config
 from api.routes.storage import router as storage_router
 from api.routes.user import router as user_router
 from api.routes.student import router as student_router
+from api.routes.document import router as document_router
 
 from api.database import SessionLocal
 
-app = FastAPI(title="docdigit-api", version="0.1")
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="docdigit-api", version="0.2")
 app.include_router(storage_router, prefix="/storage", tags=["storage"])
 app.include_router(user_router, prefix="/user", tags=["user"])
 app.include_router(student_router, prefix="/student", tags=["student"])
+app.include_router(document_router, prefix="/document", tags=["document"])
 
 
 @app.middleware("http")

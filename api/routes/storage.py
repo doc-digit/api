@@ -1,5 +1,6 @@
 import uuid
 
+from enum import Enum
 from datetime import timedelta, datetime
 from fastapi import APIRouter
 from pydantic import BaseModel, UUID4, UrlStr
@@ -52,12 +53,20 @@ class PresignedUrl(BaseModel):
     exp: int
 
 
-@router.get(
-    "/file/{file_id}", response_model=PresignedUrl, summary="Create download url"
-)
-def get_file(file_id: uuid.UUID):
+class UploadTypeEnum(str, Enum):
+    document = "document"
+    scan = "scan"
+
+
+class UploadIn(BaseModel):
+    parent_id: uuid.UUID
+    parent_type: UploadTypeEnum
+
+
+@router.get("/file/scan", response_model=PresignedUrl)
+def get_scan(file_id: uuid.UUID):
     """
-    Creates download url for selected file
+    Create download url for scan file
     """
     file_id = str(file_id)
 
@@ -75,10 +84,18 @@ def get_file(file_id: uuid.UUID):
     return {"id": file_id, "url": presigned_url, "exp": unix_exp}
 
 
-@router.get("/upload/", response_model=PresignedUrl, summary="Create upload url")
-def upload_handler():
+@router.get("/file/pdf", response_model=PresignedUrl)
+def get_pdf(file_id: uuid.UUID):
     """
-    Creates upload url for a new file
+    Create download url for pdf 
+    """
+    pass
+
+
+@router.get("/upload", response_model=PresignedUrl, summary="Create upload url")
+def upload_handler(upload: UploadIn):
+    """
+    Create upload url for a new file
     """
     file_id = str(uuid.uuid4())
 
@@ -91,4 +108,3 @@ def upload_handler():
     unix_exp = int((datetime.now() + timedelta(days=3)).timestamp())
 
     return {"id": file_id, "url": presigned_url, "exp": unix_exp}
-
