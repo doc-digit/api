@@ -11,11 +11,11 @@ requests = "*"
 minio = "*"
 "psycopg2" = "*"
 "psycopg2-binary" = "*"
-rabbitmq = "*"
 fastapi = "*"
 uvicorn = "*"
 pydantic = "*"
 sqlalchemy = "*"
+pika = "*"
 
 [requires]
 python_version = "3.7"

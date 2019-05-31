@@ -69,7 +69,7 @@ class PdfRequest(Base):
     created_date = Column(DateTime, default=datetime.datetime.utcnow)
     upload_date = Column(DateTime)
 
-    page_order = Column(ARRAY(UUID))
+    page_order = Column(ARRAY(String))
     processed = Column(Boolean, default=False)
 
 

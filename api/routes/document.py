@@ -3,13 +3,14 @@ import uuid
 from typing import List
 from datetime import datetime
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from pydantic import BaseModel, validator
 from sqlalchemy.orm import Session
 
 from api.models import DocumentType, PdfRequest, Document, Page
 
 from api.utils.get_db import get_db
+from core.background_tasks import task_generate_pdf
 
 router = APIRouter()
 
@@ -109,11 +110,20 @@ def document_status(document_id: uuid.UUID, db: Session = Depends(get_db)):
 
 
 @router.post("/create_pdf")
-def create_pdf(pdf_request: DocumentPdf, db: Session = Depends(get_db)):
+def create_pdf(
+    pdf_request: DocumentPdf,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     """
     Submit pdf creation
     """
-    return {"id": add_create_pdf(db, pdf_request)}
+    pdf_id = add_create_pdf(db, pdf_request)
+    pdf_request_dict = pdf_request.dict()
+    pdf_request_dict["id"] = pdf_id
+    background_tasks.add_task(task_generate_pdf, pdf_request_dict)
+
+    return {"id": pdf_id}
 
 
 @router.get("/types", response_model=List[DocumentTypeOut])
