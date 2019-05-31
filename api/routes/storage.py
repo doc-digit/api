@@ -85,16 +85,6 @@ def get_pdf_by_id(db_session: Session, pdf_request_id: uuid.UUID):
     return pdf
 
 
-"""
-    if upload.parent_type == "document":
-        pass
-        # 
-    elif upload.parent_type == "scan":
-        pass
-        # new page with old page data copied 
-"""
-
-
 def create_page_document(db_session: Session, document_id: uuid.UUID):
     """
     New page with document id
