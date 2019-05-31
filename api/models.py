@@ -10,7 +10,7 @@ from sqlalchemy import (
     SmallInteger,
 )
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 
 
 class CustomBase:
@@ -52,9 +52,10 @@ class Page(Base):
     __tablename__ = "pages"
     id = Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, index=True)
     created_date = Column(DateTime, default=datetime.datetime.utcnow)
+    upload_date = Column(DateTime)
     rotation = Column(SmallInteger, default=0)
 
-    processed = Column(ForeignKey("pages.id"))
+    processed_page = Column(ForeignKey("pages.id"))
     document = Column(ForeignKey("documents.id"), nullable=False)
 
     def __repr__(self):
@@ -66,8 +67,9 @@ class PdfRequest(Base):
     id = Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True, index=True)
     document = Column(ForeignKey("documents.id"), nullable=False)
     created_date = Column(DateTime, default=datetime.datetime.utcnow)
+    upload_date = Column(DateTime)
 
-    page_order = Column(String)
+    page_order = Column(ARRAY(UUID))
     processed = Column(Boolean, default=False)
 
 

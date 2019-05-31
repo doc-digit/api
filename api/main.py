@@ -17,7 +17,7 @@ from api.database import SessionLocal
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="docdigit-api", version="0.2")
+app = FastAPI(title="docdigit-api", version="0.3")
 app.include_router(storage_router, prefix="/storage", tags=["storage"])
 app.include_router(user_router, prefix="/user", tags=["user"])
 app.include_router(student_router, prefix="/student", tags=["student"])
