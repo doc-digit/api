@@ -28,7 +28,7 @@ minio_client = Minio(
     config.MINIO_HOST,
     access_key=config.MINIO_ACCESS,
     secret_key=config.MINIO_SECRET,
-    secure=False,
+    secure=config.MINIO_SECURE,
 )
 
 

@@ -3,14 +3,18 @@ import uuid
 from typing import List
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException
 from pydantic import BaseModel, validator
 from sqlalchemy.orm import Session
-
+from sqlalchemy.exc import IntegrityError
 from api.models import DocumentType, PdfRequest, Document, Page
 
+
+from api.routes.storage import generate_download_presigned_url
 from api.utils.get_db import get_db
+from api.exceptions import NotFoundException
 from core.background_tasks import task_generate_pdf
+from core import config
 
 router = APIRouter()
 
@@ -19,12 +23,28 @@ class PageOut(BaseModel):
     id: uuid.UUID
     created_date: datetime
     rotation: int = None
-    processed: bool
+    processed: bool = False
+    url: str = ""
+
+    @validator("url", always=True)
+    def set_url(cls, v, values):
+        if "id" in values:
+            return generate_download_presigned_url(
+                config.BUCKET_NAME_SCAN, str(values["id"])
+            )["url"]
+        else:
+            return ""
 
 
 class DocumentIn(BaseModel):
     user: int
     student: int
+    document_type: int = None
+
+
+class DocumentModify(BaseModel):
+    user: int = None
+    student: int = None
     document_type: int = None
 
 
@@ -61,6 +81,24 @@ def add_document(db_session: Session, document: DocumentIn):
     return document
 
 
+def update_document(
+    db_session: Session, document_id: uuid.UUID, document: DocumentModify
+):
+    db_document = db_session.query(Document).filter(Document.id == document_id).first()
+    if not db_document:
+        raise NotFoundException
+
+    for key, val in document.dict(skip_defaults=True).items():
+        setattr(db_document, key, val)
+    try:
+        db_session.commit()
+    except IntegrityError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    db_document.id = db_document.id
+    return db_document
+
+
 def get_user_documents(db_session: Session, user_id: int):
     return db_session.query(Document).filter(user_id == user_id).all()
 
@@ -90,6 +128,16 @@ def create_document(document: DocumentIn, db: Session = Depends(get_db)):
     Create a new document 
     """
     return add_document(db, document)
+
+
+@router.put("/{document_id}", response_model=DocumentOut)
+def modify_document(
+    document_id: uuid.UUID, document: DocumentModify, db: Session = Depends(get_db)
+):
+    """
+    Modify a document 
+    """
+    return update_document(db, document_id, document)
 
 
 @router.get("/list", response_model=List[DocumentOut])
