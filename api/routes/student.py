@@ -23,12 +23,12 @@ class StudentOut(BaseModel):
 
 def find_student_by_name(db_session: Session, query: str):
     q_or = or_(
-        Student.name.like("%" + query + "%"),
-        Student.surname.like("%" + query + "%"),
+        Student.name.ilike("%" + query + "%"),
+        Student.surname.ilike("%" + query + "%"),
         cast(Student.album_id, VARCHAR()).like("%" + query + "%"),
         cast(Student.semester, VARCHAR()).like("%" + query + "%"),
-        Student.course_name.like("%" + query + "%"),
-        Student.faculty.like("%" + query + "%"),
+        Student.course_name.ilike("%" + query + "%"),
+        Student.faculty.ilike("%" + query + "%"),
     )
     students = db_session.query(Student).filter(q_or).all()
     return students
