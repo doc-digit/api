@@ -1,0 +1,78 @@
+version: '3'
+
+services:
+  queue:
+    image: rabbitmq:3-management
+    hostname: queue
+    volumes:
+      - queue_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - doc_digit_cluster
+    environment:
+      RABBITMQ_DEFAULT_USER: ${QUEUE_USER}
+      RABBITMQ_DEFAULT_PASS: ${QUEUE_PASS}
+
+  database:
+    image: postgres:9.6
+    hostname: database
+    volumes:
+      - db_data:/var/lib/postgres/data
+    ports:
+      - "5432:5432"
+    networks:
+      - doc_digit_cluster
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+
+  storage:
+    image: minio/minio:RELEASE.2019-06-04T01-15-58Z
+    hostname: storage
+    volumes:
+      - storage_data:/data
+    ports:
+      - "9000:9000"
+    networks:
+      - doc_digit_cluster
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    command: server /data
+
+  api:
+    build: .
+    ports:
+      - "80:8080"
+    networks:
+      - doc_digit_cluster
+    environment:
+      RABBITMQ_URL: amqp://${QUEUE_USER}:${QUEUE_PASS}@queue:5672/%2F
+      DB_SERVER: database
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      MINIO_HOST: storage:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      BUCKET_NAME_PDF: ${BUCKET_NAME_PDF}
+      BUCKET_NAME_SCAN: ${BUCKET_NAME_SCAN}
+    depends_on:
+      - queue
+      - database
+      - storage
+
+volumes:
+  queue_data:
+    driver: local
+  db_data:
+    driver: local
+  storage_data:
+    driver: local
+
+networks:
+  doc_digit_cluster:
+    driver: bridge
