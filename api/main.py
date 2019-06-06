@@ -13,6 +13,8 @@ from api.routes.student import router as student_router
 from api.routes.document import router as document_router
 
 from api.database import SessionLocal
+from sqlalchemy.exc import IntegrityError
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,3 +40,8 @@ async def db_session_middleware(request: Request, call_next):
 @app.exception_handler(NotFoundException)
 async def not_found_exception_handler(request: Request, exc: NotFoundException):
     return JSONResponse(status_code=404, content={"message": "Not found"})
+
+
+@app.exception_handler(IntegrityError)
+async def sqlalchemy_integrity_error(request: Request, exc: IntegrityError):
+    return JSONResponse(status_code=400, content={"message": str(exc)})
