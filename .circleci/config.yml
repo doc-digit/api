@@ -9,6 +9,9 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - add_ssh_keys:
+          fingerprints:
+            - "55:69:fa:80:9b:8c:eb:31:de:43:0e:1c:c9:38:8a:0f"
       - run:
           name: Build and push Docker image
           command: |
@@ -16,3 +19,7 @@ jobs:
             docker build -t docdigit/api:$TAG .
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push docdigit/api:$TAG
+      - run:
+          name: Deploy app to Google Compute Engine via Docker
+          command: |
+            ssh -o StrictHostKeyChecking=no koczanm@35.198.90.139 "/bin/sh deploy-api.sh docdigit/api:$TAG"
