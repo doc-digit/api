@@ -9,5 +9,5 @@ RUN pipenv install --system --deploy
 
 EXPOSE 8080
 
-CMD ["uvicorn", "api.main:app"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0"]
 
