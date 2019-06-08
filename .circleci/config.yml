@@ -22,4 +22,4 @@ jobs:
       - run:
           name: Deploy app to Google Compute Engine via Docker
           command: |
-            ssh -o StrictHostKeyChecking=no koczanm@35.198.90.139 "/bin/sh deploy-api.sh docdigit/api:$TAG"
+            ssh -o StrictHostKeyChecking=no koczanm@35.198.90.139 /bin/sh deploy-api.sh docdigit/api:$TAG
