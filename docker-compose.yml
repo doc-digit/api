@@ -44,7 +44,9 @@ services:
     command: server /data
 
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.test
     ports:
       - "80:8080"
     networks:
