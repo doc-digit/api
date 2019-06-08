@@ -2,13 +2,15 @@ version: 2
 
 jobs:
   build_and_test:
+    machine: true
     working_directory: ~/github.com/doc-digit/api
     steps:
       - checkout
       - run:
-        name: Run containers using Docker Compose
-        command: docker-compose up -d --build
+          name: Run containers using Docker Compose
+          command: docker-compose up -d --build
   deploy:
+    machine: true
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
