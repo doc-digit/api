@@ -5,7 +5,6 @@ from core import config
 connection = pika.BlockingConnection(pika.URLParameters(config.RABBITMQ_URL))
 channel = connection.channel()
 channel.queue_declare(queue="generate_pdf")
-# channel.queue_declare(queue="new_page")
 
 
 def task_generate_pdf(pdf_request_dict):

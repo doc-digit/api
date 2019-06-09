@@ -59,7 +59,7 @@ class Page(Base):
     document = Column(ForeignKey("documents.id"), nullable=False)
 
     def __repr__(self):
-        return "Page {} Document {}".format(self.id, self.document_id)
+        return "Page {} Document {}".format(self.id, self.document)
 
 
 class PdfRequest(Base):

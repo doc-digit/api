@@ -16,6 +16,7 @@ uvicorn = "*"
 pydantic = "*"
 sqlalchemy = "*"
 pika = "*"
+loguru = "*"
 
 [requires]
 python_version = "3.7"

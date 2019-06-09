@@ -23,15 +23,21 @@ class PageOut(BaseModel):
     id: uuid.UUID
     created_date: datetime
     rotation: int = None
-    processed: bool = False
+    processed_page: str = None
     url: str = ""
 
     @validator("url", always=True)
     def set_url(cls, v, values):
-        if "id" in values:
-            return generate_download_presigned_url(
-                config.BUCKET_NAME_SCAN, str(values["id"])
-            )["url"]
+        if "processed_page" in values and values["processed_page"]:
+            page_id = values["processed_page"]
+        elif "id" in values:
+            try:
+                url = generate_download_presigned_url(
+                    config.BUCKET_NAME_SCAN, str(values["id"])
+                )["url"]
+            except NotFoundException:
+                url = "Error page not found"
+            return url
         else:
             return ""
 
@@ -105,8 +111,10 @@ def get_user_documents(db_session: Session, user_id: int):
 
 def get_document_status(db_session: Session, document_id: uuid.UUID):
     document = db_session.query(Document).filter(Document.id == document_id).first()
-    pages = db_session.query(Page).filter(Page.document == document_id).all()
+    if document is None:
+        raise NotFoundException
 
+    pages = db_session.query(Page).filter(Page.document == document_id).all()
     setattr(document, "pages", pages)
     return document
 

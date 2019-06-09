@@ -195,3 +195,4 @@ def upload_pdf(upload: UploadInPdf, db: Session = Depends(get_db)):
         raise NotFoundException
 
     return generate_upload_presigned_url(config.BUCKET_NAME_PDF, pdf_request.id)
+
