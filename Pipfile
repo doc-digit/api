@@ -6,10 +6,10 @@ name = "pypi"
 [dev-packages]
 pylint = "*"
 requests = "*"
+pytest = "*"
 
 [packages]
 minio = "*"
-"psycopg2" = "*"
 "psycopg2-binary" = "*"
 fastapi = "*"
 uvicorn = "*"

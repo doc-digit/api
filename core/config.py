@@ -6,8 +6,8 @@ if not SECRET_KEY:
 
 # minio
 MINIO_HOST = os.getenv("MINIO_HOST")
-MINIO_ACCESS = os.getenv("MINIO_ACCESS")
-MINIO_SECRET = os.getenv("MINIO_SECRET")
+MINIO_ACCESS = os.getenv("MINIO_ACCESS_KEY")
+MINIO_SECRET = os.getenv("MINIO_SECRET_KEY")
 MINIO_SECURE = bool(os.getenv("MINIO_SECURE", False))
 BUCKET_NAME_PDF = os.getenv("BUCKET_NAME_PDF")
 BUCKET_NAME_SCAN = os.getenv("BUCKET_NAME_SCAN")
