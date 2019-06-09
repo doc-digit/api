@@ -1,4 +1,4 @@
-version: '3'
+version: '2.4'
 
 services:
   queue:
@@ -13,7 +13,17 @@ services:
       - doc_digit_cluster
     environment:
       RABBITMQ_DEFAULT_USER: ${QUEUE_USER}
-      RABBITMQ_DEFAULT_PASS: ${QUEUE_PASS}
+      RABBITMQ_DEFAULT_PASS: ${QUEUE_PASSWORD}
+    healthcheck:
+      test: rabbitmqctl eval '
+              { true, rabbit_app_booted_and_running } = { rabbit:is_booted(node()), rabbit_app_booted_and_running },
+              { [], no_alarms } = { rabbit:alarms(), no_alarms },
+              [] /= rabbit_networking:active_listeners(),
+              rabbitmq_node_is_healthy.
+              ' || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   database:
     image: postgres:9.6
@@ -27,7 +37,12 @@ services:
     environment:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   storage:
     image: minio/minio:RELEASE.2019-06-04T01-15-58Z
@@ -52,20 +67,23 @@ services:
     networks:
       - doc_digit_cluster
     environment:
-      RABBITMQ_URL: amqp://${QUEUE_USER}:${QUEUE_PASS}@queue:5672/%2F
+      RABBITMQ_URL: amqp://${QUEUE_USER}:${QUEUE_PASSWORD}@queue:5672/%2F
       DB_SERVER: database
       DB_DATABASE: ${DB_DATABASE}
       DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
+      DB_PASSWORD: ${DB_PASSWORD}
       MINIO_HOST: storage:9000
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       BUCKET_NAME_PDF: ${BUCKET_NAME_PDF}
       BUCKET_NAME_SCAN: ${BUCKET_NAME_SCAN}
     depends_on:
-      - queue
-      - database
-      - storage
+      queue:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
 
 volumes:
   queue_data:
