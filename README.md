@@ -41,10 +41,44 @@ Although Minio is nice, we found that some features that we need are missing. Th
 ### Draft of client flow:
 
 - client uploads file (possibly photo), adapter (server returns file key) -oauth 2 authorization code grant PKCE
-- adapter uploads file to storage (now minio), after upload is complete adapter adds a task to a rabbitmq2. Processing microservice
+- adapter uploads file to storage (now minio), after upload is complete adapter adds a task to a rabbitmq. Processing microservice
 - gets task from rabbitmq, then do processing and send a file to adapter
 - adapter uploads file to storage (now minio) and sends info to client (sse or sth idk now)3. Pdf is produced by server.
 - server send file to adapter, adapter uploads pdf to different bucket,
 - when requested adapter sends pdfs and gets sharing url from storage (now minio )
 
-## next part coming soon....
+## Minio listener
+
+There is a need to run minio_listener.py in order to handle minio upload notifications.
+
+```
+pipenv shell
+python minio_listener.py
+```
+
+Bindings for rabbitmq:
+
+```json
+"bindings":[
+
+    {
+        "source":"amq.direct",
+        "vhost":"/",
+        "destination":"new_page",
+        "destination_type":"queue",
+        "routing_key":"new_page",
+        "arguments":{
+        }
+    },
+    {
+        "source":"bucketevents",
+        "vhost":"/",
+        "destination":"bucketlogs",
+        "destination_type":"queue",
+        "routing_key":"bucketlogs",
+        "arguments":{
+        }
+    }
+
+]
+```
