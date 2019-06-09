@@ -2,7 +2,8 @@ version: 2
 
 jobs:
   build_and_test:
-    docker: circleci/buildpack-deps:18.04
+    docker:
+      - image: circleci/buildpack-deps:18.04
     working_directory: ~/github.com/doc-digit/api
     steps:
       - checkout
@@ -10,7 +11,8 @@ jobs:
           name: Run containers using Docker Compose
           command: docker-compose up -d --build
   deploy:
-    docker: circleci/buildpack-deps:18.04
+    docker:
+      - image: circleci/buildpack-deps:18.04
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
