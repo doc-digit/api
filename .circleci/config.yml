@@ -11,7 +11,7 @@ jobs:
           docker_layer_caching: true
       - run:
           name: Run containers using Docker Compose
-          command: docker-compose up --build
+          command: docker-compose up --build --abort-on-container-exit
   deploy:
     docker:
       - image: circleci/buildpack-deps:18.04
